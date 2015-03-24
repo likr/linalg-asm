@@ -2,7 +2,7 @@ var expect = require('expect.js');
 
 var LinalgModule = require('./index');
 
-describe('axpy', function() {
+describe('daxpy', function() {
   it('calculate y := a x + y', function() {
     var heap = new ArrayBuffer(64),
         x = new Float64Array(heap, 0, 4),
@@ -24,5 +24,22 @@ describe('axpy', function() {
     expect(y[1]).to.be(9);
     expect(y[2]).to.be(11.5);
     expect(y[3]).to.be(14);
+  });
+});
+
+describe('dasum', function() {
+  it('return |x_1| + ... + |x_n|', function() {
+    var heap = new ArrayBuffer(32),
+        x = new Float64Array(heap, 0, 4);
+    var linalg = LinalgModule(global, null, heap);
+
+    x[0] = 0.5;
+    x[1] = -1.5;
+    x[2] = 2.5;
+    x[3] = -3.5;
+
+    var result = linalg.dasum(4, 0, 1);
+
+    expect(result).to.be(8);
   });
 });
