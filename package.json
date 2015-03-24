@@ -1,0 +1,27 @@
+{
+  "name": "linalg-asm",
+  "version": "0.0.1",
+  "description": "Linear algebra using asm.js",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "grunt test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/likr/linalg-asm.git"
+  },
+  "author": "Yosuke ONOUE <onoue@likr-lab.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/likr/linalg-asm/issues"
+  },
+  "homepage": "https://github.com/likr/linalg-asm",
+  "devDependencies": {
+    "expect.js": "^0.3.1",
+    "gulp": "^3.8.11",
+    "gulp-mocha": "^2.0.0"
+  }
+}
