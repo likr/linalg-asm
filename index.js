@@ -66,10 +66,35 @@ function LinalgModule(stdlib, foreign, heap) {
     }
   }
 
+  function ddot(n, x, incX, y, incY) {
+    n = n | 0;
+    x = x | 0;
+    incX = incX | 0;
+    y = y | 0;
+    incY = incY | 0;
+
+    var i = 0,
+        j = 0,
+        value = 0.0;
+
+    n = n << 3;
+    x = x << 3;
+    incX = incX << 3;
+    y = y << 3;
+    incY = incY << 3;
+
+    for (i = x, j = y; (i | 0) < (n | 0); i = i + incX | 0, j = j + incY | 0) {
+      value = value + darray[i >> 3] * darray[j >> 3];
+    }
+
+    return value;
+  }
+
   return {
     daxpy: daxpy,
     dasum: dasum,
-    dcopy: dcopy
+    dcopy: dcopy,
+    ddot: ddot
   };
 }
 
