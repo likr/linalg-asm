@@ -1,7 +1,14 @@
-var gulp = require('gulp');
-var mocha = require('gulp-mocha');
+var gulp = require('gulp'),
+    watch = require('gulp-watch'),
+    mocha = require('gulp-mocha');
 
-gulp.task('default', function() {
+gulp.task('test', function() {
   return gulp.src('test.js', {read: false})
     .pipe(mocha({reporter: 'nyan'}));
 });
+
+gulp.task('watch', function() {
+  gulp.watch('**/*.js', ['test']);
+});
+
+gulp.task('default', ['test']);
