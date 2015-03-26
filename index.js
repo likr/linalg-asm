@@ -141,6 +141,39 @@ function LinalgModule(stdlib, foreign, heap) {
     return index | 0;
   }
 
+  function dgemv(trans, m, n, alpha, a, lda, x, incx, beta, y, incy) {
+    // TODO support lda
+    trans = trans | 0;
+    m = m | 0;
+    n = n | 0;
+    alpha = +alpha;
+    a = a | 0;
+    lda = lda | 0;
+    x = x | 0;
+    incx = incx | 0;
+    beta = +beta;
+    y = y | 0;
+    incy = incy | 0;
+
+    var i = 0,
+        j = 0,
+        paij = 0,
+        pxj = 0,
+        pyi = 0,
+        val = 0.0;
+
+    for (i = 0; (i | 0) < (m | 0); i = i + 1 | 0) {
+      pyi = y + ((imul(i, incx) | 0) << 3) | 0;
+      val = beta * darray[pyi >> 3];
+      for (j = 0; (j | 0) < (n | 0); j = j + 1 | 0) {
+        paij = a + ((imul(i, n) | 0) + j << 3) | 0;
+        pxj = x + ((imul(j, incy) | 0) << 3) | 0;
+        val = val + alpha * darray[paij >> 3] * darray[pxj >> 3];
+      }
+      darray[pyi >> 3] = val;
+    }
+  }
+
   function dtrsv(uplo, trans, diag, n, a, lda, x, incx) {
     // TODO support trans, lda
     uplo = uplo | 0;
@@ -300,6 +333,7 @@ function LinalgModule(stdlib, foreign, heap) {
     ddot: ddot,
     dswap: dswap,
     idamax: idamax,
+    dgemv: dgemv,
     dtrsv: dtrsv,
     dgemm: dgemm,
     dgesv: dgesv,
