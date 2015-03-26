@@ -14,7 +14,7 @@ describe('dcopy', function() {
     x[2] = 3;
     x[3] = 4;
 
-    linalg.dcopy(4, 0, 1, 4, 1);
+    linalg.dcopy(4, x.byteOffset, 1, y.byteOffset, 1);
 
     expect(y[0]).to.be(1);
     expect(y[1]).to.be(2);
