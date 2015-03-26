@@ -141,6 +141,55 @@ function LinalgModule(stdlib, foreign, heap) {
     return index | 0;
   }
 
+  function dtrsv(uplo, trans, diag, n, a, lda, x, incx) {
+    // TODO support trans, lda
+    uplo = uplo | 0;
+    trans = trans | 0;
+    diag = diag | 0;
+    n = n | 0;
+    a = a | 0;
+    lda = lda | 0;
+    x = x | 0;
+    incx = incx | 0;
+
+    var i = 0,
+        j = 0,
+        paii = 0,
+        paji = 0,
+        pxi = 0,
+        pxj = 0;
+
+    if (uplo) {
+      // lower triangular matrix
+      for (i = 0; (i | 0) < (n | 0); i = i + 1 | 0) {
+        pxi = x + ((imul(i, incx) | 0) << 3) | 0;
+        if (!diag) {
+          paii = a + ((imul(i, n) | 0) + i << 3) | 0;
+          darray[pxi >> 3] = darray[pxi >> 3] / darray[paii >> 3];
+        }
+        for (j = i + 1 | 0; (j | 0) < (n | 0); j = j + 1 | 0) {
+          paji = a + ((imul(j, n) | 0) + i << 3) | 0;
+          pxj = x + ((imul(j, incx) | 0) << 3) | 0;
+          darray[pxj >> 3] = darray[pxj >> 3] - darray[pxi >> 3] * darray[paji >> 3];
+        }
+      }
+    } else {
+      // upper triangular matrix
+      for (i = n - 1 | 0; (i | 0) >= 0; i = i - 1 | 0) {
+        pxi = x + ((imul(i, incx) | 0) << 3) | 0;
+        if (!diag) {
+          paii = a + ((imul(i, n) | 0) + i << 3) | 0;
+          darray[pxi >> 3] = darray[pxi >> 3] / darray[paii >> 3];
+        }
+        for (j = 0; (j | 0) < (i | 0); j = j + 1 | 0) {
+          paji = a + ((imul(j, n) | 0) + i << 3) | 0;
+          pxj = x + ((imul(j, incx) | 0) << 3) | 0;
+          darray[pxj >> 3] = darray[pxj >> 3] - darray[pxi >> 3] * darray[paji >> 3];
+        }
+      }
+    }
+  }
+
   function dgemm(transa, transb, m, n, k, alpha, a, lda, b, ldb, beta, c, ldc) {
     // TODO support transa, transb, lda, ldb, ldc
     transa = transa | 0;
@@ -175,6 +224,38 @@ function LinalgModule(stdlib, foreign, heap) {
         }
       }
     }
+  }
+
+  function dgesv(n, nrhs, a, lda, ipiv, b, ldb) {
+    n = n | 0;
+    nrhs = nrhs | 0;
+    a = a | 0;
+    lda = lda | 0;
+    ipiv = ipiv | 0;
+    b = b | 0;
+    ldb = ldb | 0;
+
+    var i = 0,
+        j = 0,
+        tmp = 0.0,
+        pipivi = 0,
+        pbi = 0,
+        pbj = 0;
+
+    dgetrf(n, n, a, lda, ipiv);
+
+    for (i = 0; (i | 0) < (n | 0); i = i + 1 | 0) {
+      pipivi = ipiv + (i << 2) | 0;
+      j = uiarray[pipivi >> 2] | 0;
+      pbi = b + (i << 3) | 0;
+      pbj = b + (j << 3) | 0;
+      tmp = +darray[pbi >> 3];
+      darray[pbi >> 3] = darray[pbj >> 3];
+      darray[pbj >> 3] = tmp;
+    }
+
+    dtrsv(1, 0, 1, n, a, lda, b, 1);
+    dtrsv(0, 0, 0, n, a, lda, b, 1);
   }
 
   function dgetrf(m, n, a, lda, ipiv) {
@@ -219,7 +300,9 @@ function LinalgModule(stdlib, foreign, heap) {
     ddot: ddot,
     dswap: dswap,
     idamax: idamax,
+    dtrsv: dtrsv,
     dgemm: dgemm,
+    dgesv: dgesv,
     dgetrf: dgetrf
   };
 }
