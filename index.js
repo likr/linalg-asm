@@ -90,48 +90,45 @@ function LinalgModule(stdlib, foreign, heap) {
     return value;
   }
 
-  function dswap(n, x, incX, y, incY) {
+  function dswap(n, x, incx, y, incy) {
     n = n | 0;
     x = x | 0;
-    incX = incX | 0;
+    incx = incx | 0;
     y = y | 0;
-    incY = incY | 0;
+    incy = incy | 0;
 
     var i = 0,
-        j = 0,
+        pxi = 0,
+        pyi = 0,
         tmp = 0.0;
 
-    n = x + n << 3;
-    x = x << 3;
-    incX = incX << 3;
-    y = y << 3;
-    incY = incY << 3;
+    incx = incx << 3;
+    incy = incy << 3;
 
-    for (i = x, j = y; (i | 0) < (n | 0); i = i + incX | 0, j = j + incY | 0) {
-      tmp = +darray[i >> 3];
-      darray[i >> 3] = darray[j >> 3];
-      darray[j >> 3] = tmp;
+    for (i = 0, pxi = x, pyi = y; (i | 0) < (n | 0); i = i + 1 | 0, pxi = pxi + incx | 0, pyi = pyi + incy | 0) {
+      tmp = +darray[pxi >> 3];
+      darray[pxi >> 3] = darray[pyi >> 3];
+      darray[pyi >> 3] = tmp;
     }
   }
 
-  function idamax(n, x, incX) {
+  function idamax(n, x, incx) {
     n = n | 0;
     x = x | 0;
-    incX = incX | 0;
+    incx = incx | 0;
 
     var i = 0,
+        pxi = 0,
         index = 0,
         tmp = 0.0,
         value = 0.0;
 
-    n = (imul(n, incX) | 0) << 3;
-    x = x << 3;
-    incX = incX << 3;
+    incx = incx << 3;
 
-    for (i = x; (i | 0) < (n | 0); i = i + incX | 0) {
-      tmp = +abs(darray[i >> 3]);
+    for (i = 0, pxi = x; (i | 0) < (n | 0); i = i + 1 | 0, pxi = pxi + incx | 0) {
+      tmp = +abs(darray[pxi >> 3]);
       if (tmp > value) {
-        index = (i - x | 0) / (incX | 0) |  0;
+        index = i;
         value = tmp;
       }
     }
@@ -301,23 +298,26 @@ function LinalgModule(stdlib, foreign, heap) {
         j = 0,
         k = 0,
         l = 0,
-        jk = 0,
-        jl = 0,
-        kk = 0,
-        kl = 0;
+        pipivk = 0,
+        paik = 0,
+        pajk = 0,
+        pakk = 0,
+        pajl = 0,
+        pakl = 0;
 
     for (k = 0; (k | 0) < (n - 1 | 0); k = k + 1 | 0) {
       i = k + (idamax(n - k | 0, a + (imul(i, n) | 0) + k | 0, m) | 0) | 0;
-      uiarray[ipiv + (k << 2) >> 2] = i;
-      dswap(n, a + (imul(i, n) | 0) | 0, 1, a + (imul(k, n) | 0) | 0, 1);
+      pipivk = ipiv + (k << 2) | 0;
+      uiarray[pipivk >> 2] = i;
+      dswap(n, a + ((imul(i, n) | 0) << 3) | 0, 1, a + ((imul(k, n) | 0) << 3) | 0, 1);
       for (j = k + 1 | 0; (j | 0) < (n | 0); j = j + 1 | 0) {
-        jk = a + (imul(j, n) | 0) + k << 3;
-        kk = a + (imul(k, n) | 0) + k << 3;
-        darray[jk >> 3] = darray[jk >> 3] / darray[kk >> 3];
+        pajk = a + ((imul(j, n) | 0) + k << 3) | 0;
+        pakk = a + ((imul(k, n) | 0) + k << 3) | 0;
+        darray[pajk >> 3] = darray[pajk >> 3] / darray[pakk >> 3];
         for (l = k + 1 | 0; (l | 0) < (n | 0); l = l + 1 | 0) {
-          jl = a + (imul(j, n) | 0) + l << 3;
-          kl = a + (imul(k, n) | 0) + l << 3;
-          darray[jl >> 3] = darray[jl >> 3] - darray[jk >> 3] * darray[kl >> 3];
+          pajl = a + ((imul(j, n) | 0) + l << 3) | 0;
+          pakl = a + ((imul(k, n) | 0) + l << 3) | 0;
+          darray[pajl >> 3] = darray[pajl >> 3] - darray[pajk >> 3] * darray[pakl >> 3];
         }
       }
     }

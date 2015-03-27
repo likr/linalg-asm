@@ -18,7 +18,7 @@ describe('dswap', function() {
     y[2] = 7;
     y[3] = 8;
 
-    var value = linalg.dswap(4, 0, 1, 4, 1);
+    var value = linalg.dswap(4, x.byteOffset, 1, y.byteOffset, 1);
 
     expect(x[0]).to.be(5);
     expect(x[1]).to.be(6);
@@ -45,7 +45,7 @@ describe('dswap', function() {
     y[2] = 7;
     y[3] = 8;
 
-    var value = linalg.dswap(3, 1, 1, 4, 1);
+    var value = linalg.dswap(3, x.byteOffset + 8, 1, y.byteOffset, 1);
 
     expect(x[0]).to.be(1);
     expect(x[1]).to.be(5);
