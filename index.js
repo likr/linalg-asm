@@ -306,7 +306,7 @@ function LinalgModule(stdlib, foreign, heap) {
         pakl = 0;
 
     for (k = 0; (k | 0) < (n - 1 | 0); k = k + 1 | 0) {
-      i = k + (idamax(n - k | 0, a + ((imul(i, n) | 0) << 3) + k | 0, m) | 0) | 0;
+      i = k + (idamax(n - k | 0, a + ((imul(k, n) | 0) + k << 3) | 0, m) | 0) | 0;
       pipivk = ipiv + (k << 2) | 0;
       uiarray[pipivk >> 2] = i;
       dswap(n, a + ((imul(i, n) | 0) << 3) | 0, 1, a + ((imul(k, n) | 0) << 3) | 0, 1);
