@@ -254,6 +254,61 @@ function LinalgModule(stdlib, foreign, heap) {
     }
   }
 
+  function dtrsm(side, uplo, transa, diag, m, n, alpha, a, lda, b, ldb) {
+    side = side | 0;
+    uplo = uplo | 0;
+    transa = transa | 0;
+    diag = diag | 0;
+    m = m | 0;
+    n = n | 0;
+    alpha = +alpha;
+    a = a | 0;
+    lda = lda | 0;
+    b = b | 0;
+    ldb = ldb | 0;
+
+    var i = 0,
+        j = 0,
+        paii = 0,
+        paji = 0,
+        pbik = 0,
+        pbjk = 0;
+
+    if (uplo) {
+      // lower triangular matrix
+      for (i = 0; (i | 0) < (m | 0); i = i + 1 | 0) {
+        pbi = b + ((imul(i, incx) | 0) << 3) | 0;
+        if (!diag) {
+          paii = a + ((imul(i, m) | 0) + i << 3) | 0;
+          darray[pbi >> 3] = darray[pbi >> 3] / darray[paii >> 3];
+        }
+        for (j = i + 1 | 0; (j | 0) < (n | 0); j = j + 1 | 0) {
+          paji = a + ((imul(j, n) | 0) + i << 3) | 0;
+          pbj = b + ((imul(j, incx) | 0) << 3) | 0;
+          darray[pbj >> 3] = darray[pbj >> 3] - darray[pbi >> 3] * darray[paji >> 3];
+        }
+      }
+    } else {
+      // upper triangular matrix
+      for (i = n - 1 | 0; (i | 0) >= 0; i = i - 1 | 0) {
+        if (!diag) {
+          paii = a + ((imul(i, m) | 0) + i << 3) | 0;
+          for (k = 0; (k | 0) < (n | 0); K = k + 1 | 0) {
+            pbik = b + ((imul(i, n) + k| 0) << 3) | 0;
+            darray[pbik >> 3] = darray[pbik >> 3] / darray[paii >> 3];
+          }
+        }
+        for (j = 0; (j | 0) < (i | 0); j = j + 1 | 0) {
+          paji = a + ((imul(j, m) | 0) + i << 3) | 0;
+          for (k = 0; (k | 0) < (n | 0); k = k + 1 | 0) {
+            pbjk = b + ((imul(j, n) | 0) + k << 3) | 0;
+            darray[pbjk >> 3] = darray[pbjk >> 3] - darray[pbik >> 3] * darray[paji >> 3];
+          }
+        }
+      }
+    }
+  }
+
   function dgesv(n, nrhs, a, lda, ipiv, b, ldb) {
     n = n | 0;
     nrhs = nrhs | 0;
@@ -333,6 +388,7 @@ function LinalgModule(stdlib, foreign, heap) {
     idamax: idamax,
     dgemv: dgemv,
     dtrsv: dtrsv,
+    dtrsm: dtrsm,
     dgemm: dgemm,
     dgesv: dgesv,
     dgetrf: dgetrf
