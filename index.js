@@ -64,25 +64,23 @@ function LinalgModule(stdlib, foreign, heap) {
     }
   }
 
-  function ddot(n, x, incX, y, incY) {
+  function ddot(n, x, incx, y, incy) {
     n = n | 0;
     x = x | 0;
-    incX = incX | 0;
+    incx = incx | 0;
     y = y | 0;
-    incY = incY | 0;
+    incy = incy | 0;
 
     var i = 0,
-        j = 0,
+        pxi = 0,
+        pyi = 0,
         value = 0.0;
 
-    n = n << 3;
-    x = x << 3;
-    incX = incX << 3;
-    y = y << 3;
-    incY = incY << 3;
+    incx = incx << 3;
+    incy = incy << 3;
 
-    for (i = x, j = y; (i | 0) < (n | 0); i = i + incX | 0, j = j + incY | 0) {
-      value = value + darray[i >> 3] * darray[j >> 3];
+    for (i = 0, pxi = x, pyi = y; (i | 0) < (n | 0); i = i + 1 | 0, pxi = pxi + incx | 0, pyi = pyi + incy) {
+      value = value + darray[pxi >> 3] * darray[pyi >> 3];
     }
 
     return value;
