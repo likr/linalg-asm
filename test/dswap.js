@@ -1,13 +1,12 @@
-var expect = require('expect.js');
-
-var LinalgModule = require('../index');
+var expect = require('expect.js'),
+    linalgModule = require('../index');
 
 describe('dswap', function() {
   it('calculates x, y := y, x', function() {
     var heap = new ArrayBuffer(64),
         x = new Float64Array(heap, 0, 4),
         y = new Float64Array(heap, 32, 4),
-        linalg = LinalgModule(global, null, heap);
+        linalg = linalgModule(global, null, heap);
 
     x[0] = 1;
     x[1] = 2;
@@ -18,7 +17,7 @@ describe('dswap', function() {
     y[2] = 7;
     y[3] = 8;
 
-    var value = linalg.dswap(4, x.byteOffset, 1, y.byteOffset, 1);
+    linalg.dswap(4, x.byteOffset, 1, y.byteOffset, 1);
 
     expect(x[0]).to.be(5);
     expect(x[1]).to.be(6);
@@ -34,7 +33,7 @@ describe('dswap', function() {
     var heap = new ArrayBuffer(64),
         x = new Float64Array(heap, 0, 4),
         y = new Float64Array(heap, 32, 4),
-        linalg = LinalgModule(global, null, heap);
+        linalg = linalgModule(global, null, heap);
 
     x[0] = 1;
     x[1] = 2;
@@ -45,7 +44,7 @@ describe('dswap', function() {
     y[2] = 7;
     y[3] = 8;
 
-    var value = linalg.dswap(3, x.byteOffset + 8, 1, y.byteOffset, 1);
+    linalg.dswap(3, x.byteOffset + 8, 1, y.byteOffset, 1);
 
     expect(x[0]).to.be(1);
     expect(x[1]).to.be(5);

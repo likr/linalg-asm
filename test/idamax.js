@@ -1,12 +1,11 @@
-var expect = require('expect.js');
-
-var LinalgModule = require('../index');
+var expect = require('expect.js'),
+    linalgModule = require('../index');
 
 describe('idamax', function() {
   it('returns index of max abs value', function() {
     var heap = new ArrayBuffer(32),
         x = new Float64Array(heap, 0, 4),
-        linalg = LinalgModule(global, null, heap);
+        linalg = linalgModule(global, null, heap);
 
     x[0] = 0.5;
     x[1] = -1.5;
@@ -21,7 +20,7 @@ describe('idamax', function() {
   it('returns index of max abs value with incX', function() {
     var heap = new ArrayBuffer(32),
         x = new Float64Array(heap, 0, 4),
-        linalg = LinalgModule(global, null, heap);
+        linalg = linalgModule(global, null, heap);
 
     x[0] = 0.5;
     x[1] = -1.5;
@@ -36,7 +35,7 @@ describe('idamax', function() {
   it('returns index of max abs value with non zero offset', function() {
     var heap = new ArrayBuffer(48),
         x = new Float64Array(heap, 16, 4),
-        linalg = LinalgModule(global, null, heap);
+        linalg = linalgModule(global, null, heap);
 
     x[0] = 0.5;
     x[1] = -1.5;

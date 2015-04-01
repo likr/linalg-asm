@@ -2,7 +2,6 @@ var expect = require('expect.js'),
     linalgModule = require('../index');
 
 describe('dscal', function() {
-  'use strict';
   it('computes x := a x', function() {
     var heap = new ArrayBuffer(32),
         x = new Float64Array(heap, 0, 4),

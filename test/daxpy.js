@@ -1,13 +1,12 @@
-var expect = require('expect.js');
-
-var LinalgModule = require('../index');
+var expect = require('expect.js'),
+    linalgModule = require('../index');
 
 describe('daxpy', function() {
   it('calculate y := a x + y', function() {
     var heap = new ArrayBuffer(64),
         x = new Float64Array(heap, 0, 4),
         y = new Float64Array(heap, 32, 4),
-        linalg = LinalgModule(global, null, heap);
+        linalg = linalgModule(global, null, heap);
 
     x[0] = 1;
     x[1] = 2;

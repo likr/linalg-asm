@@ -1,12 +1,11 @@
-var expect = require('expect.js');
-
-var LinalgModule = require('../index');
+var expect = require('expect.js'),
+    linalgModule = require('../index');
 
 describe('dasum', function() {
   it('return |x_1| + ... + |x_n|', function() {
     var heap = new ArrayBuffer(32),
         x = new Float64Array(heap, 0, 4),
-        linalg = LinalgModule(global, null, heap);
+        linalg = linalgModule(global, null, heap);
 
     x[0] = 0.5;
     x[1] = -1.5;

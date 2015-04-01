@@ -2,7 +2,6 @@ var expect = require('expect.js'),
     linalgModule = require('../index');
 
 describe('dtrsm', function() {
-  'use strict';
   it('solves U X = B', function() {
     var heap = new ArrayBuffer(120),
         a = new Float64Array(heap, 0, 9),
