@@ -3,9 +3,9 @@ var expect = require('expect.js'),
 
 describe('daxpy', function() {
   it('calculate y := a x + y', function() {
-    var heap = new ArrayBuffer(64),
-        x = new Float64Array(heap, 0, 4),
-        y = new Float64Array(heap, 32, 4),
+    var heap = new ArrayBuffer(80),
+        x = new Float64Array(heap, 16, 4),
+        y = new Float64Array(heap, 48, 4),
         linalg = linalgModule(global, null, heap);
 
     x[0] = 1;
@@ -17,7 +17,7 @@ describe('daxpy', function() {
     y[2] = 7;
     y[3] = 8;
 
-    linalg.daxpy(4, 1.5, 0, 1, 4, 1);
+    linalg.daxpy(4, 1.5, x.byteOffset, 1, y.byteOffset, 1);
 
     expect(y[0]).to.be(6.5);
     expect(y[1]).to.be(9);
