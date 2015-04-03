@@ -21,7 +21,7 @@ function LinalgModule(stdlib, foreign, heap) {
     incx = incx << 3;
     incy = incy << 3;
 
-    for (i = 0, pxi = x, pyi = y; (i | 0) < (n | 0); i = i + 1 | 0, pxi = pxi + incx | 0, pyi = pyi + incy) {
+    for (i = 0, pxi = x, pyi = y; (i | 0) < (n | 0); i = i + 1 | 0, pxi = pxi + incx | 0, pyi = pyi + incy | 0) {
       darray[pyi >> 3] = alpha * darray[pxi >> 3] + (+darray[pyi >> 3]);
     }
   }
@@ -79,7 +79,7 @@ function LinalgModule(stdlib, foreign, heap) {
     incx = incx << 3;
     incy = incy << 3;
 
-    for (i = 0, pxi = x, pyi = y; (i | 0) < (n | 0); i = i + 1 | 0, pxi = pxi + incx | 0, pyi = pyi + incy) {
+    for (i = 0, pxi = x, pyi = y; (i | 0) < (n | 0); i = i + 1 | 0, pxi = pxi + incx | 0, pyi = pyi + incy | 0) {
       value = value + darray[pxi >> 3] * darray[pyi >> 3];
     }
 
