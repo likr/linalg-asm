@@ -394,27 +394,29 @@ function LinalgModule(stdlib, foreign, heap) {
     var i = 0,
         j = 0,
         k = 0,
-        l = 0,
+        jn = 0,
+        kn = 0,
         pipivk = 0,
         pajk = 0,
         pakk = 0,
-        pajl = 0,
-        pakl = 0;
+        ajk = 0.0,
+        dakk = 0.0,
+        inca = 0;
+    inca = n << 3;
 
-    for (k = 0; (k | 0) < (n - 1 | 0); k = k + 1 | 0) {
-      i = k + (idamax(n - k | 0, a + ((imul(k, n) | 0) + k << 3) | 0, m) | 0) | 0;
+    for (k = 0, kn = 0, pakk = a; (k | 0) < (n - 1 | 0); k = k + 1 | 0, kn = kn + n | 0, pakk = pakk + inca + 8 | 0) {
+      i = k + (idamax(n - k | 0, pakk, m) | 0) | 0;
       pipivk = ipiv + (k << 2) | 0;
       uiarray[pipivk >> 2] = i;
-      dswap(n, a + ((imul(i, n) | 0) << 3) | 0, 1, a + ((imul(k, n) | 0) << 3) | 0, 1);
-      for (j = k + 1 | 0; (j | 0) < (n | 0); j = j + 1 | 0) {
-        pajk = a + ((imul(j, n) | 0) + k << 3) | 0;
-        pakk = a + ((imul(k, n) | 0) + k << 3) | 0;
-        darray[pajk >> 3] = darray[pajk >> 3] / darray[pakk >> 3];
-        for (l = k + 1 | 0; (l | 0) < (n | 0); l = l + 1 | 0) {
-          pajl = a + ((imul(j, n) | 0) + l << 3) | 0;
-          pakl = a + ((imul(k, n) | 0) + l << 3) | 0;
-          darray[pajl >> 3] = darray[pajl >> 3] - darray[pajk >> 3] * darray[pakl >> 3];
-        }
+      if ((i | 0) != (k | 0)) {
+        dswap(n, a + ((imul(i, n) | 0) << 3) | 0, 1, a + (kn << 3) | 0, 1);
+      }
+      dakk = 1.0 / +darray[pakk >> 3];
+      for (j = k + 1 | 0, jn = imul(j, n) | 0, pajk = a + (jn + k << 3) | 0; (j | 0) < (n | 0); j = j + 1 | 0, jn = jn + n | 0, pajk = pajk + inca | 0) {
+        ajk = darray[pajk >> 3] = darray[pajk >> 3] * dakk;
+        daxpy(n - k - 1 | 0, -ajk,
+              a + (kn + k + 1 << 3) | 0, 1,
+              a + (jn + k + 1 << 3) | 0, 1);
       }
     }
     uiarray[ipiv + (n - 1 << 2) >> 2] = n - 1;
