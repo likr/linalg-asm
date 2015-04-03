@@ -25,7 +25,7 @@ function LinalgModule(stdlib, foreign, heap) {
         dy2 = 0,
         dy3 = 0;
 
-    if (alpha == 0) {
+    if (alpha == 0.0) {
       return;
     }
 
@@ -33,11 +33,11 @@ function LinalgModule(stdlib, foreign, heap) {
     incx = incx << 3;
     incy = incy << 3;
     dx1 = incx;
-    dx2 = dx1 + incx;
-    dx3 = dx2 + incx;
+    dx2 = dx1 + incx | 0;
+    dx3 = dx2 + incx | 0;
     dy1 = incy;
-    dy2 = dy1 + incy;
-    dy3 = dy2 + incy;
+    dy2 = dy1 + incy | 0;
+    dy3 = dy2 + incy | 0;
 
     incx = incx << 2;
     incy = incy << 2;
