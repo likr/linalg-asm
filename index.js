@@ -21,7 +21,7 @@ function LinalgModule(stdlib, foreign, heap) {
     incx = incx << 3;
     incy = incy << 3;
 
-    if (alpha == 0) {
+    if (alpha == 0.0) {
       return;
     }
 
