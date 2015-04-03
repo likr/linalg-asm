@@ -15,17 +15,41 @@ function LinalgModule(stdlib, foreign, heap) {
     incy = incy | 0;
 
     var i = 0,
+        nloop = 0,
         pxi = 0,
-        pyi = 0;
-
-    incx = incx << 3;
-    incy = incy << 3;
+        pyi = 0,
+        dx1 = 0,
+        dx2 = 0,
+        dx3 = 0,
+        dy1 = 0,
+        dy2 = 0,
+        dy3 = 0;
 
     if (alpha == 0) {
       return;
     }
 
-    for (i = 0, pxi = x, pyi = y; (i | 0) < (n | 0); i = i + 1 | 0, pxi = pxi + incx | 0, pyi = pyi + incy | 0) {
+    nloop = n >> 2;
+    incx = incx << 3;
+    incy = incy << 3;
+    dx1 = incx;
+    dx2 = dx1 + incx;
+    dx3 = dx2 + incx;
+    dy1 = incy;
+    dy2 = dy1 + incy;
+    dy3 = dy2 + incy;
+
+    incx = incx << 2;
+    incy = incy << 2;
+    for (i = 0, pxi = x, pyi = y; (i | 0) < (nloop | 0); i = i + 1 | 0, pxi = pxi + incx | 0, pyi = pyi + incy | 0) {
+      darray[pyi >> 3] = +darray[pyi >> 3] + alpha * darray[pxi >> 3];
+      darray[pyi + dy1 >> 3] = +darray[pyi + dy1 >> 3] + alpha * darray[pxi + dx1 >> 3];
+      darray[pyi + dy2 >> 3] = +darray[pyi + dy2 >> 3] + alpha * darray[pxi + dx2 >> 3];
+      darray[pyi + dy3 >> 3] = +darray[pyi + dy3 >> 3] + alpha * darray[pxi + dx3 >> 3];
+    }
+
+    i = i << 2;
+    for (incx = incx >> 2, incy = incy >> 2; (i | 0) < (n | 0); i = i + 1 | 0, pxi = pxi + incx | 0, pyi = pyi + incy | 0) {
       darray[pyi >> 3] = +darray[pyi >> 3] + alpha * darray[pxi >> 3];
     }
   }
