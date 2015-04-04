@@ -3,6 +3,7 @@ function LinalgModule(stdlib, foreign, heap) {
 
   var abs = stdlib.Math.abs,
       imul = stdlib.Math.imul,
+      sqrt = stdlib.Math.sqrt,
       uiarray = new stdlib.Uint32Array(heap),
       darray = new stdlib.Float64Array(heap);
 
@@ -450,6 +451,44 @@ function LinalgModule(stdlib, foreign, heap) {
     uiarray[ipiv + (n - 1 << 2) >> 2] = n - 1;
   }
 
+  function dpotrf(uplo, n, a, lda) {
+    uplo = uplo | 0;
+    n = n | 0;
+    a = a | 0;
+    lda = lda | 0;
+
+    var i = 0,
+        paii = 0,
+        pai = 0,
+        aii = 0.0;
+
+    if (uplo) {
+      // lower triangular matrix
+      for (i = 0; (i | 0) < (n | 0); i = i + 1 | 0) {
+        paii = a + ((imul(i, lda) | 0) + i << 3) | 0;
+        pai = a + ((imul(i, lda) | 0) << 3) | 0;
+        aii = +darray[paii >> 3];
+        aii = darray[paii >> 3] = +sqrt(aii - +ddot(i | 0, pai, 1, pai, 1));
+        if ((n - i - 1 | 0) > 0) {
+          dgemv(0, n - i - 1 | 0, i, -1.0, pai + (lda << 3) | 0, 1, pai, 1, 1.0, paii + (lda << 3) | 0, lda);
+          dscal(n - i - 1 | 0, 1.0 / aii, paii + (lda << 3) | 0, lda);
+        }
+      }
+    } else {
+      // upper triangular matrix
+      for (i = 0; (i | 0) < (n | 0); i = i + 1 | 0) {
+        paii = a + ((imul(i, lda) | 0) + i << 3) | 0;
+        pai = a + (i << 3) | 0;
+        aii = +darray[paii >> 3];
+        aii = darray[paii >> 3] = +sqrt(aii - +ddot(i | 0, pai, lda, pai, lda));
+        if ((n - i - 1 | 0) > 0) {
+          dgemv(1, i, n - i - 1 | 0, -1.0, pai + 8 | 0, lda, pai, lda, 1.0, paii + 8 | 0, 1);
+          dscal(n - i - 1 | 0, 1.0 / aii, paii + 8 | 0, lda);
+        }
+      }
+    }
+  }
+
   function dscal(n, a, x, incx) {
     n = n | 0;
     a = +a;
@@ -562,6 +601,7 @@ function LinalgModule(stdlib, foreign, heap) {
     dgesv: dgesv,
     dgetri: dgetri,
     dgetrf: dgetrf,
+    dpotrf: dpotrf,
     dscal: dscal,
     dswap: dswap,
     dtrmv: dtrmv,
