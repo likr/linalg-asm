@@ -292,7 +292,7 @@ function LinalgModule(stdlib, foreign, heap) {
   }
 
   function dtrsm(side, uplo, transa, diag, m, n, alpha, a, lda, b, ldb) {
-    // TODO support side, transa, lda, ldb
+    // TODO support side
     side = side | 0;
     uplo = uplo | 0;
     transa = transa | 0;
@@ -313,41 +313,83 @@ function LinalgModule(stdlib, foreign, heap) {
         pbik = 0,
         pbjk = 0;
 
-    if (uplo) {
-      // lower triangular matrix
-      for (i = 0; (i | 0) < (m | 0); i = i + 1 | 0) {
-        if (!diag) {
-          paii = a + ((imul(i, m) | 0) + i << 3) | 0;
-          for (k = 0; (k | 0) < (n | 0); k = k + 1 | 0) {
-            pbik = b + ((imul(i, n) | 0) + k << 3) | 0;
-            darray[pbik >> 3] = darray[pbik >> 3] / darray[paii >> 3];
+    if (transa) {
+      if (uplo) {
+        // solve a U^t x = B
+        for (i = m - 1 | 0; (i | 0) >= 0; i = i - 1 | 0) {
+          if (!diag) {
+            paii = a + ((imul(i, lda) | 0) + i << 3) | 0;
+            for (k = 0; (k | 0) < (n | 0); k = k + 1 | 0) {
+              pbik = b + ((imul(i, ldb) | 0) + k << 3) | 0;
+              darray[pbik >> 3] = darray[pbik >> 3] / darray[paii >> 3];
+            }
+          }
+          for (j = 0; (j | 0) < (i | 0); j = j + 1 | 0) {
+            paji = a + ((imul(i, lda) | 0) + j << 3) | 0;
+            for (k = 0; (k | 0) < (n | 0); k = k + 1 | 0) {
+              pbik = b + ((imul(i, ldb) | 0) + k << 3) | 0;
+              pbjk = b + ((imul(j, ldb) | 0) + k << 3) | 0;
+              darray[pbjk >> 3] = darray[pbjk >> 3] - darray[pbik >> 3] * darray[paji >> 3];
+            }
           }
         }
-        for (j = i + 1 | 0; (j | 0) < (m | 0); j = j + 1 | 0) {
-          paji = a + ((imul(j, m) | 0) + i << 3) | 0;
-          for (k = 0; (k | 0) < (n | 0); k = k + 1 | 0) {
-            pbik = b + ((imul(i, n) | 0) + k << 3) | 0;
-            pbjk = b + ((imul(j, n) | 0) + k << 3) | 0;
-            darray[pbjk >> 3] = darray[pbjk >> 3] - darray[pbik >> 3] * darray[paji >> 3];
+      } else {
+        // solve a L^t x = B
+        for (i = 0; (i | 0) < (m | 0); i = i + 1 | 0) {
+          if (!diag) {
+            paii = a + ((imul(i, lda) | 0) + i << 3) | 0;
+            for (k = 0; (k | 0) < (n | 0); k = k + 1 | 0) {
+              pbik = b + ((imul(i, ldb) | 0) + k << 3) | 0;
+              darray[pbik >> 3] = darray[pbik >> 3] / darray[paii >> 3];
+            }
+          }
+          for (j = i + 1 | 0; (j | 0) < (m | 0); j = j + 1 | 0) {
+            paji = a + ((imul(i, lda) | 0) + j << 3) | 0;
+            for (k = 0; (k | 0) < (n | 0); k = k + 1 | 0) {
+              pbik = b + ((imul(i, ldb) | 0) + k << 3) | 0;
+              pbjk = b + ((imul(j, ldb) | 0) + k << 3) | 0;
+              darray[pbjk >> 3] = darray[pbjk >> 3] - darray[pbik >> 3] * darray[paji >> 3];
+            }
           }
         }
       }
     } else {
-      // upper triangular matrix
-      for (i = m - 1 | 0; (i | 0) >= 0; i = i - 1 | 0) {
-        if (!diag) {
-          paii = a + ((imul(i, m) | 0) + i << 3) | 0;
-          for (k = 0; (k | 0) < (n | 0); k = k + 1 | 0) {
-            pbik = b + ((imul(i, n) | 0) + k << 3) | 0;
-            darray[pbik >> 3] = darray[pbik >> 3] / darray[paii >> 3];
+      if (uplo) {
+        // solve a L x = B
+        for (i = 0; (i | 0) < (m | 0); i = i + 1 | 0) {
+          if (!diag) {
+            paii = a + ((imul(i, lda) | 0) + i << 3) | 0;
+            for (k = 0; (k | 0) < (n | 0); k = k + 1 | 0) {
+              pbik = b + ((imul(i, ldb) | 0) + k << 3) | 0;
+              darray[pbik >> 3] = darray[pbik >> 3] / darray[paii >> 3];
+            }
+          }
+          for (j = i + 1 | 0; (j | 0) < (m | 0); j = j + 1 | 0) {
+            paji = a + ((imul(j, lda) | 0) + i << 3) | 0;
+            for (k = 0; (k | 0) < (n | 0); k = k + 1 | 0) {
+              pbik = b + ((imul(i, ldb) | 0) + k << 3) | 0;
+              pbjk = b + ((imul(j, ldb) | 0) + k << 3) | 0;
+              darray[pbjk >> 3] = darray[pbjk >> 3] - darray[pbik >> 3] * darray[paji >> 3];
+            }
           }
         }
-        for (j = 0; (j | 0) < (i | 0); j = j + 1 | 0) {
-          paji = a + ((imul(j, m) | 0) + i << 3) | 0;
-          for (k = 0; (k | 0) < (n | 0); k = k + 1 | 0) {
-            pbik = b + ((imul(i, n) | 0) + k << 3) | 0;
-            pbjk = b + ((imul(j, n) | 0) + k << 3) | 0;
-            darray[pbjk >> 3] = darray[pbjk >> 3] - darray[pbik >> 3] * darray[paji >> 3];
+      } else {
+        // solve a U x = B
+        for (i = m - 1 | 0; (i | 0) >= 0; i = i - 1 | 0) {
+          if (!diag) {
+            paii = a + ((imul(i, lda) | 0) + i << 3) | 0;
+            for (k = 0; (k | 0) < (n | 0); k = k + 1 | 0) {
+              pbik = b + ((imul(i, ldb) | 0) + k << 3) | 0;
+              darray[pbik >> 3] = darray[pbik >> 3] / darray[paii >> 3];
+            }
+          }
+          for (j = 0; (j | 0) < (i | 0); j = j + 1 | 0) {
+            paji = a + ((imul(j, lda) | 0) + i << 3) | 0;
+            for (k = 0; (k | 0) < (n | 0); k = k + 1 | 0) {
+              pbik = b + ((imul(i, ldb) | 0) + k << 3) | 0;
+              pbjk = b + ((imul(j, ldb) | 0) + k << 3) | 0;
+              darray[pbjk >> 3] = darray[pbjk >> 3] - darray[pbik >> 3] * darray[paji >> 3];
+            }
           }
         }
       }
@@ -451,6 +493,19 @@ function LinalgModule(stdlib, foreign, heap) {
     uiarray[ipiv + (n - 1 << 2) >> 2] = n - 1;
   }
 
+  function dposv(uplo, n, nrhs, a, lda, b, ldb) {
+    uplo = uplo | 0;
+    n = n | 0;
+    nrhs = nrhs | 0;
+    a = a | 0;
+    lda = lda | 0;
+    b = b | 0;
+    ldb = ldb | 0;
+
+    dpotrf(uplo, n, a, lda);
+    dpotrs(uplo, n, nrhs, a, lda, b, ldb);
+  }
+
   function dpotrf(uplo, n, a, lda) {
     uplo = uplo | 0;
     n = n | 0;
@@ -486,6 +541,25 @@ function LinalgModule(stdlib, foreign, heap) {
           dscal(n - i - 1 | 0, 1.0 / aii, paii + 8 | 0, lda);
         }
       }
+    }
+  }
+
+  function dpotrs(uplo, n, nrhs, a, lda, b, ldb) {
+    uplo = uplo | 0;
+    n = n | 0;
+    nrhs = nrhs | 0;
+    a = a | 0;
+    lda = lda | 0;
+    b = b | 0;
+    ldb = ldb | 0;
+
+    if (uplo) {
+      // lower triangular matrix
+      dtrsm(0, 1, 0, 0, n, nrhs, 1.0, a, lda, b, ldb);
+      dtrsm(0, 1, 1, 0, n, nrhs, 1.0, a, lda, b, ldb);
+    } else {
+      dtrsm(0, 0, 1, 0, n, nrhs, 1.0, a, lda, b, ldb);
+      dtrsm(0, 0, 0, 0, n, nrhs, 1.0, a, lda, b, ldb);
     }
   }
 
@@ -601,7 +675,9 @@ function LinalgModule(stdlib, foreign, heap) {
     dgesv: dgesv,
     dgetri: dgetri,
     dgetrf: dgetrf,
+    dposv: dposv,
     dpotrf: dpotrf,
+    dpotrs: dpotrs,
     dscal: dscal,
     dswap: dswap,
     dtrmv: dtrmv,

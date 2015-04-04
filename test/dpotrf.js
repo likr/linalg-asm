@@ -1,7 +1,7 @@
 var expect = require('expect.js'),
     linalgModule = require('../index');
 
-describe('dgetrf', function() {
+describe('dpotrf', function() {
   it('computes the Cholesky factorization A = L L^t', function() {
     var heap = new ArrayBuffer(72),
         a = new Float64Array(heap, 0, 9),
