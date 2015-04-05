@@ -604,6 +604,20 @@ function LinalgModule(stdlib, foreign, heap) {
     }
   }
 
+  function dsysv(uplo, n, nrhs, a, lda, ipiv, b, ldb) {
+    uplo = uplo | 0;
+    n = n | 0;
+    nrhs = nrhs | 0;
+    a = a | 0;
+    lda = lda | 0;
+    ipiv = ipiv | 0;
+    b = b | 0;
+    ldb = ldb | 0;
+
+    dsytrf(uplo, n, a, lda, ipiv);
+    dsytrs(uplo, n, nrhs, a, lda, ipiv, b, ldb);
+  }
+
   function dsytrf(uplo, n, a, lda, ipiv) {
     uplo = uplo | 0;
     n = n | 0;
@@ -662,6 +676,43 @@ function LinalgModule(stdlib, foreign, heap) {
       dscal(k, r1, a + (k << 3) | 0, lda);
       uiarray[ipiv + (k << 2) >> 2] = kp;
     }
+  }
+
+  function dsytrs(uplo, n, nrhs, a, lda, ipiv, b, ldb) {
+    uplo = uplo | 0;
+    n = n | 0;
+    nrhs = nrhs | 0;
+    a = a | 0;
+    lda = lda | 0;
+    ipiv = ipiv | 0;
+    b = b | 0;
+    ldb = ldb | 0;
+
+    var i = 0,
+        j = 0,
+        paii = 0,
+        pbi = 0,
+        pbj = 0,
+        pipivi = 0;
+
+    for (i = 0; (i | 0) < (n | 0); i = i + 1 | 0) {
+      pipivi = ipiv + (i << 2) | 0;
+      j = uiarray[pipivi >> 2] | 0;
+      if ((i | 0) != (j | 0)) {
+        pbi = b + ((imul(i, ldb) | 0) << 3) | 0;
+        pbj = b + ((imul(j, ldb) | 0) << 3) | 0;
+        dswap(nrhs, pbi, 1, pbj, 1);
+      }
+    }
+
+    dtrsm(0, 0, 0, 1, n, nrhs, 1.0, a, lda, b, ldb);
+
+    for (i = 0; (i | 0) < (n | 0); i = i + 1 | 0) {
+      paii = a + ((imul(i, lda) | 0) + i << 3) | 0;
+      dscal(nrhs, 1.0 / darray[paii >> 3], b + ((imul(i, ldb) | 0) << 3) | 0, 1);
+    }
+
+    dtrsm(0, 0, 1, 1, n, nrhs, 1.0, a, lda, b, ldb);
   }
 
   function dtrmv(uplo, trans, diag, n, a, lda, x, incx) {
@@ -766,7 +817,9 @@ function LinalgModule(stdlib, foreign, heap) {
     dscal: dscal,
     dswap: dswap,
     dsyr: dsyr,
+    dsysv: dsysv,
     dsytrf: dsytrf,
+    dsytrs: dsytrs,
     dtrmv: dtrmv,
     dtrsv: dtrsv,
     dtrsm: dtrsm,
