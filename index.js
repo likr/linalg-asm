@@ -594,12 +594,23 @@ function LinalgModule(stdlib, foreign, heap) {
         pxi = 0,
         pxj = 0;
 
-    for (i = 0; (i | 0) < (n | 0); i = i + 1 | 0) {
-      pxi = x + ((imul(i, incx) | 0) << 3) | 0;
-      for (j = i; (j | 0) < (n | 0); j = j + 1 | 0) {
-        paij = a + ((imul(i, lda) | 0) + j << 3) | 0;
-        pxj = x + ((imul(j, incx) | 0) << 3) | 0;
-        darray[paij >> 3] = +darray[paij >> 3] + alpha * +darray[pxi >> 3] * +darray[pxj >> 3];
+    if (uplo) {
+      for (i = 0; (i | 0) < (n | 0); i = i + 1 | 0) {
+        pxi = x + ((imul(i, incx) | 0) << 3) | 0;
+        for (j = i; (j | 0) < (n | 0); j = j + 1 | 0) {
+          paij = a + ((imul(j, lda) | 0) + i << 3) | 0;
+          pxj = x + ((imul(j, incx) | 0) << 3) | 0;
+          darray[paij >> 3] = +darray[paij >> 3] + alpha * +darray[pxi >> 3] * +darray[pxj >> 3];
+        }
+      }
+    } else {
+      for (i = 0; (i | 0) < (n | 0); i = i + 1 | 0) {
+        pxi = x + ((imul(i, incx) | 0) << 3) | 0;
+        for (j = i; (j | 0) < (n | 0); j = j + 1 | 0) {
+          paij = a + ((imul(i, lda) | 0) + j << 3) | 0;
+          pxj = x + ((imul(j, incx) | 0) << 3) | 0;
+          darray[paij >> 3] = +darray[paij >> 3] + alpha * +darray[pxi >> 3] * +darray[pxj >> 3];
+        }
       }
     }
   }
@@ -637,44 +648,94 @@ function LinalgModule(stdlib, foreign, heap) {
         t = 0.0,
         r1 = 0.0;
 
-    for (k = n - 1 | 0; (k | 0) >= 0; k = k - 1 | 0) {
-      pakk = a + ((imul(k, lda) | 0) + k << 3) | 0;
-      absakk = +abs(darray[pakk >> 3]);
-      if ((k | 0) > 1) {
-        imax = idamax(k, a + (k << 3) | 0, lda) | 0;
-        colmax = +abs(darray[a + ((imul(imax, lda) | 0) + k << 3) >> 3]);
-      } else {
-        colmax = 0.0;
-      }
+    if (uplo) {
+      for (k = 0; (k | 0) < (n | 0); k = k + 1 | 0) {
+        pakk = a + ((imul(k, lda) | 0) + k << 3) | 0;
+        absakk = +abs(darray[pakk >> 3]);
+        if ((k | 0) < (n - 1 | 0)) {
+          imax = k + 1 + (idamax(n - k - 1 | 0, a + ((imul(k + 1 | 0, lda) | 0) + k << 3) | 0, lda) | 0) | 0;
+          colmax = +abs(darray[a + ((imul(imax, lda) | 0) + k << 3) >> 3]);
+        } else {
+          colmax = 0.0;
+        }
 
-      if (absakk > colmax) {
-        kp = k;
-      } else {
-        jmax = imax + (idamax(k - imax + 1 | 0, a + ((imul(imax, lda) | 0) + imax + 1 << 3) | 0, lda) | 0) | 0;
-        rowmax = +abs(darray[a + ((imul(imax, lda) | 0) + jmax << 3) >> 3]);
-        if (absakk >= colmax * colmax / rowmax) {
+        if (absakk >= colmax) {
           kp = k;
         } else {
-          kp = imax;
+          jmax = k + (idamax(imax - k | 0, a + ((imul(imax, lda) | 0) + k << 3) | 0, 1) | 0) | 0;
+          rowmax = +abs(darray[a + ((imul(imax, lda) | 0) + jmax << 3) >> 3]);
+          if (absakk >= colmax * colmax / rowmax) {
+            kp = k;
+          } else {
+            kp = imax;
+          }
         }
+
+        if ((kp | 0) != (k | 0)) {
+          pakpkp = a + ((imul(kp, lda) | 0) + kp << 3) | 0;
+          if ((kp | 0) < (n - 1 | 0)) {
+            dswap(n - kp - 1 | 0,
+                a + ((imul(kp + 1 | 0, lda) | 0) + k << 3) | 0, lda,
+                a + ((imul(kp + 1 | 0, lda) | 0) + kp << 3) | 0, lda);
+          }
+          dswap(kp - k - 1 | 0,
+              a + ((imul(k + 1 | 0, lda) | 0) + k << 3) | 0, lda,
+              a + ((imul(kp, lda) | 0) + k + 1 << 3) | 0, 1);
+
+          t = +darray[pakk >> 3];
+          darray[pakk >> 3] = darray[pakpkp >> 3];
+          darray[pakpkp >> 3] = t;
+        }
+
+        if ((k | 0) < (n - 1 | 0)) {
+          r1 = 1.0 / darray[pakk >> 3];
+          dsyr(uplo, n - k - 1 | 0, -r1,
+              a + ((imul(k + 1 | 0, lda) | 0) + k << 3) | 0, lda,
+              a + ((imul(k + 1 | 0, lda) | 0) + k + 1 << 3) | 0, lda);
+          dscal(n - k - 1 | 0, r1, a + ((imul(k + 1 | 0, lda) | 0) + k << 3) | 0, lda);
+        }
+        uiarray[ipiv + (k << 2) >> 2] = kp;
       }
+    } else {
+      for (k = n - 1 | 0; (k | 0) >= 0; k = k - 1 | 0) {
+        pakk = a + ((imul(k, lda) | 0) + k << 3) | 0;
+        absakk = +abs(darray[pakk >> 3]);
+        if ((k | 0) > 1) {
+          imax = idamax(k, a + (k << 3) | 0, lda) | 0;
+          colmax = +abs(darray[a + ((imul(imax, lda) | 0) + k << 3) >> 3]);
+        } else {
+          colmax = 0.0;
+        }
 
-      if ((kp | 0) != (k | 0)) {
-        pakpkp = a + ((imul(k, lda) | 0) | kp << 3) | 0;
-        dswap(kp, a + (k << 3) | 0, lda, a + (kp << 3) | 0, lda);
-        dswap(k - kp | 0,
-            a + ((imul(kp + 1 | 0, lda) | 0) + k << 3) | 0, lda,
-            a + ((imul(kp, lda) | 0) + kp + 1 << 3) | 0, lda);
+        if (absakk > colmax) {
+          kp = k;
+        } else {
+          jmax = imax + (idamax(k - imax + 1 | 0, a + ((imul(imax, lda) | 0) + imax + 1 << 3) | 0, lda) | 0) | 0;
+          rowmax = +abs(darray[a + ((imul(imax, lda) | 0) + jmax << 3) >> 3]);
+          if (absakk >= colmax * colmax / rowmax) {
+            kp = k;
+          } else {
+            kp = imax;
+          }
+        }
 
-        t = +darray[pakk >> 3];
-        darray[pakk >> 3] = darray[pakpkp >> 3];
-        darray[pakpkp >> 3] = t;
+        if ((kp | 0) != (k | 0)) {
+          pakpkp = a + ((imul(kp, lda) | 0) + kp << 3) | 0;
+          dswap(kp, a + (k << 3) | 0, lda, a + (kp << 3) | 0, lda);
+          dswap(k - kp | 0,
+              a + ((imul(kp + 1 | 0, lda) | 0) + k << 3) | 0, lda,
+              a + ((imul(kp, lda) | 0) + kp + 1 << 3) | 0, 1);
+
+          t = +darray[pakk >> 3];
+          darray[pakk >> 3] = darray[pakpkp >> 3];
+          darray[pakpkp >> 3] = t;
+        }
+
+        r1 = 1.0 / darray[pakk >> 3];
+        dsyr(uplo, k, -r1, a + (k << 3) | 0, lda, a, lda);
+        dscal(k, r1, a + (k << 3) | 0, lda);
+        uiarray[ipiv + (k << 2) >> 2] = kp;
       }
-
-      r1 = 1.0 / darray[pakk >> 3];
-      dsyr(uplo, k, -r1, a + (k << 3) | 0, lda, a, lda);
-      dscal(k, r1, a + (k << 3) | 0, lda);
-      uiarray[ipiv + (k << 2) >> 2] = kp;
     }
   }
 
