@@ -666,6 +666,8 @@ function LinalgModule(stdlib, foreign, heap) {
           rowmax = +abs(darray[a + ((imul(imax, lda) | 0) + jmax << 3) >> 3]);
           if (absakk >= colmax * colmax / rowmax) {
             kp = k;
+          } else if(+abs(darray[a + ((imul(imax, lda) | 0) + imax << 3) >> 3]) < rowmax) {
+            kp = k;
           } else {
             kp = imax;
           }

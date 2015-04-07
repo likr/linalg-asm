@@ -31,7 +31,6 @@ describe('dsysv', function() {
     a.set([3, 0, 0, 1, 4, 0, -2, -3, 0]);
     b.set([-1.2, -1.2, -5]);
     linalg.dsysv(1, 3, 1, a.byteOffset, 3, ipiv.byteOffset, b.byteOffset, 1);
-    console.log(a, b, ipiv);
 
     expect(+b[0].toFixed(6)).to.be(0.690323);
     expect(+b[1].toFixed(6)).to.be(1.206452);

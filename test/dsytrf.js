@@ -45,11 +45,12 @@ describe('dsytrf', function() {
     a.set([10, -10, -4, -10, 1, -14, -4, -14, -2]);
     linalg.dsytrf(1, 3, a.byteOffset, 3, ipiv.byteOffset);
 
+    console.log(a, ipiv);
     expect(a[0]).to.be(10);
     expect(a[3]).to.be(-1);
-    expect(a[4]).to.be(-18 / 5);
+    expect(a[4]).to.be(-9);
     expect(a[6]).to.be(-2 / 5);
-    expect(a[7]).to.be(5);
-    expect(a[8]).to.be(81);
+    expect(a[7]).to.be(2);
+    expect(a[8]).to.be(162 / 5);
   });
 });
