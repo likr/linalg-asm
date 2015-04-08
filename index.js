@@ -256,7 +256,6 @@ function LinalgModule(stdlib, foreign, heap) {
   }
 
   function dgemm(transa, transb, m, n, k, alpha, a, lda, b, ldb, beta, c, ldc) {
-    // TODO support transa, transb
     transa = transa | 0;
     transb = transb | 0;
     m = m | 0;
@@ -273,19 +272,48 @@ function LinalgModule(stdlib, foreign, heap) {
 
     var i = 0,
         j = 0,
-        l = 0,
-        pail = 0,
-        pblj = 0,
+        pai0 = 0,
+        pb0j = 0,
         pcij = 0;
 
-    for (i = 0; (i | 0) < (m | 0); i = i + 1 | 0) {
-      for (j = 0; (j | 0) < (n | 0); j = j + 1 | 0) {
-        pcij = c + ((imul(i, ldc) | 0) + j << 3) | 0;
-        darray[pcij >> 3] = beta * darray[pcij >> 3];
-        for (l = 0; (l | 0) < (k | 0); l = l + 1 | 0) {
-          pail = a + ((imul(i, lda) | 0) + l << 3) | 0;
-          pblj = b + ((imul(l, ldb) | 0) + j << 3) | 0;
-          darray[pcij >> 3] = +darray[pcij >> 3] + alpha * darray[pail >> 3] * darray[pblj >> 3];
+    if (transa) {
+      if (transb) {
+        for (i = 0; (i | 0) < (m | 0); i = i + 1 | 0) {
+          for (j = 0; (j | 0) < (n | 0); j = j + 1 | 0) {
+            pai0 = a + (i << 3) | 0;
+            pb0j = b + ((imul(j, ldb) | 0) << 3) | 0;
+            pcij = c + ((imul(i, ldc) | 0) + j << 3) | 0;
+            darray[pcij >> 3] = beta * darray[pcij >> 3] + alpha * +ddot(k, pai0, lda, pb0j, 1);
+          }
+        }
+      } else {
+        for (i = 0; (i | 0) < (m | 0); i = i + 1 | 0) {
+          for (j = 0; (j | 0) < (n | 0); j = j + 1 | 0) {
+            pai0 = a + (i << 3) | 0;
+            pb0j = b + (j << 3) | 0;
+            pcij = c + ((imul(i, ldc) | 0) + j << 3) | 0;
+            darray[pcij >> 3] = beta * darray[pcij >> 3] + alpha * +ddot(k, pai0, lda, pb0j, ldb);
+          }
+        }
+      }
+    } else {
+      if (transb) {
+        for (i = 0; (i | 0) < (m | 0); i = i + 1 | 0) {
+          for (j = 0; (j | 0) < (n | 0); j = j + 1 | 0) {
+            pai0 = a + ((imul(i, lda) | 0) << 3) | 0;
+            pb0j = b + ((imul(j, ldb) | 0) << 3) | 0;
+            pcij = c + ((imul(i, ldc) | 0) + j << 3) | 0;
+            darray[pcij >> 3] = beta * darray[pcij >> 3] + alpha * +ddot(k, pai0, 1, pb0j, 1);
+          }
+        }
+      } else {
+        for (i = 0; (i | 0) < (m | 0); i = i + 1 | 0) {
+          for (j = 0; (j | 0) < (n | 0); j = j + 1 | 0) {
+            pai0 = a + ((imul(i, lda) | 0) << 3) | 0;
+            pb0j = b + (j << 3) | 0;
+            pcij = c + ((imul(i, ldc) | 0) + j << 3) | 0;
+            darray[pcij >> 3] = beta * darray[pcij >> 3] + alpha * +ddot(k, pai0, 1, pb0j, ldb);
+          }
         }
       }
     }
