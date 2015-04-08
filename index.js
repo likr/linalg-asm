@@ -256,7 +256,7 @@ function LinalgModule(stdlib, foreign, heap) {
   }
 
   function dgemm(transa, transb, m, n, k, alpha, a, lda, b, ldb, beta, c, ldc) {
-    // TODO support transa, transb, lda, ldb, ldc
+    // TODO support transa, transb
     transa = transa | 0;
     transb = transb | 0;
     m = m | 0;
@@ -274,18 +274,18 @@ function LinalgModule(stdlib, foreign, heap) {
     var i = 0,
         j = 0,
         l = 0,
-        aIndex = 0,
-        bIndex = 0,
-        cIndex = 0;
+        pail = 0,
+        pblj = 0,
+        pcij = 0;
 
     for (i = 0; (i | 0) < (m | 0); i = i + 1 | 0) {
       for (j = 0; (j | 0) < (n | 0); j = j + 1 | 0) {
-        cIndex = c + (imul(i, n) | 0) + j << 3;
-        darray[cIndex >> 3] = beta * darray[cIndex >> 3];
+        pcij = c + ((imul(i, ldc) | 0) + j << 3) | 0;
+        darray[pcij >> 3] = beta * darray[pcij >> 3];
         for (l = 0; (l | 0) < (k | 0); l = l + 1 | 0) {
-          aIndex = a + (imul(i, k) | 0) + l << 3;
-          bIndex = b + (imul(l, k) | 0) + j << 3;
-          darray[cIndex >> 3] = +darray[cIndex >> 3] + alpha * darray[aIndex >> 3] * darray[bIndex >> 3];
+          pail = a + ((imul(i, lda) | 0) + l << 3) | 0;
+          pblj = b + ((imul(l, ldb) | 0) + j << 3) | 0;
+          darray[pcij >> 3] = +darray[pcij >> 3] + alpha * darray[pail >> 3] * darray[pblj >> 3];
         }
       }
     }

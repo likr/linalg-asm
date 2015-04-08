@@ -37,7 +37,7 @@ describe('dgemm', function() {
     c[7] = 1;
     c[8] = -2;
 
-    linalg.dgemm(0, 0, 3, 3, 3, 3.0, 0, 3, 9, 3, -2.0, 18, 3);
+    linalg.dgemm(0, 0, 3, 3, 3, 3.0, a.byteOffset, 3, b.byteOffset, 3, -2.0, c.byteOffset, 3);
 
     expect(c[0]).to.be(21);
     expect(c[1]).to.be(336);
