@@ -241,7 +241,7 @@ function LinalgModule(stdlib, foreign, heap) {
         pxi = x + ((imul(i, incx) | 0) << 3) | 0;
         if (!diag) {
           paii = a + ((imul(i, n) | 0) + i << 3) | 0;
-          darray[pxi >> 3] = darray[pxi >> 3] / darray[paii >> 3];
+          darray[pxi >> 3] = +darray[pxi >> 3] / +darray[paii >> 3];
         }
         for (j = i + 1 | 0; (j | 0) < (n | 0); j = j + 1 | 0) {
           paji = a + ((imul(j, n) | 0) + i << 3) | 0;
@@ -255,7 +255,7 @@ function LinalgModule(stdlib, foreign, heap) {
         pxi = x + ((imul(i, incx) | 0) << 3) | 0;
         if (!diag) {
           paii = a + ((imul(i, n) | 0) + i << 3) | 0;
-          darray[pxi >> 3] = darray[pxi >> 3] / darray[paii >> 3];
+          darray[pxi >> 3] = +darray[pxi >> 3] / +darray[paii >> 3];
         }
         for (j = 0; (j | 0) < (i | 0); j = j + 1 | 0) {
           paji = a + ((imul(j, n) | 0) + i << 3) | 0;
@@ -360,7 +360,7 @@ function LinalgModule(stdlib, foreign, heap) {
             paii = a + ((imul(i, lda) | 0) + i << 3) | 0;
             for (k = 0; (k | 0) < (n | 0); k = k + 1 | 0) {
               pbik = b + ((imul(i, ldb) | 0) + k << 3) | 0;
-              darray[pbik >> 3] = darray[pbik >> 3] / darray[paii >> 3];
+              darray[pbik >> 3] = +darray[pbik >> 3] / +darray[paii >> 3];
             }
           }
           for (j = 0; (j | 0) < (i | 0); j = j + 1 | 0) {
@@ -379,7 +379,7 @@ function LinalgModule(stdlib, foreign, heap) {
             paii = a + ((imul(i, lda) | 0) + i << 3) | 0;
             for (k = 0; (k | 0) < (n | 0); k = k + 1 | 0) {
               pbik = b + ((imul(i, ldb) | 0) + k << 3) | 0;
-              darray[pbik >> 3] = darray[pbik >> 3] / darray[paii >> 3];
+              darray[pbik >> 3] = +darray[pbik >> 3] / +darray[paii >> 3];
             }
           }
           for (j = i + 1 | 0; (j | 0) < (m | 0); j = j + 1 | 0) {
@@ -400,7 +400,7 @@ function LinalgModule(stdlib, foreign, heap) {
             paii = a + ((imul(i, lda) | 0) + i << 3) | 0;
             for (k = 0; (k | 0) < (n | 0); k = k + 1 | 0) {
               pbik = b + ((imul(i, ldb) | 0) + k << 3) | 0;
-              darray[pbik >> 3] = darray[pbik >> 3] / darray[paii >> 3];
+              darray[pbik >> 3] = +darray[pbik >> 3] / +darray[paii >> 3];
             }
           }
           for (j = i + 1 | 0; (j | 0) < (m | 0); j = j + 1 | 0) {
@@ -419,7 +419,7 @@ function LinalgModule(stdlib, foreign, heap) {
             paii = a + ((imul(i, lda) | 0) + i << 3) | 0;
             for (k = 0; (k | 0) < (n | 0); k = k + 1 | 0) {
               pbik = b + ((imul(i, ldb) | 0) + k << 3) | 0;
-              darray[pbik >> 3] = darray[pbik >> 3] / darray[paii >> 3];
+              darray[pbik >> 3] = +darray[pbik >> 3] / +darray[paii >> 3];
             }
           }
           for (j = 0; (j | 0) < (i | 0); j = j + 1 | 0) {
@@ -729,7 +729,7 @@ function LinalgModule(stdlib, foreign, heap) {
         }
 
         if ((k | 0) < (n - 1 | 0)) {
-          r1 = 1.0 / darray[pakk >> 3];
+          r1 = 1.0 / +darray[pakk >> 3];
           dsyr(uplo, n - k - 1 | 0, -r1,
               a + ((imul(k + 1 | 0, lda) | 0) + k << 3) | 0, lda,
               a + ((imul(k + 1 | 0, lda) | 0) + k + 1 << 3) | 0, lda);
@@ -772,7 +772,7 @@ function LinalgModule(stdlib, foreign, heap) {
           darray[pakpkp >> 3] = t;
         }
 
-        r1 = 1.0 / darray[pakk >> 3];
+        r1 = 1.0 / +darray[pakk >> 3];
         dsyr(uplo, k, -r1, a + (k << 3) | 0, lda, a, lda);
         dscal(k, r1, a + (k << 3) | 0, lda);
         uiarray[ipiv + (k << 2) >> 2] = kp;
@@ -817,7 +817,7 @@ function LinalgModule(stdlib, foreign, heap) {
     // y := L^t^-1 D^-1 y
     for (i = 0; (i | 0) < (n | 0); i = i + 1 | 0) {
       paii = a + ((imul(i, lda) | 0) + i << 3) | 0;
-      dscal(nrhs, 1.0 / darray[paii >> 3], b + ((imul(i, ldb) | 0) << 3) | 0, 1);
+      dscal(nrhs, 1.0 / +darray[paii >> 3], b + ((imul(i, ldb) | 0) << 3) | 0, 1);
     }
     dtrsm(0, uplo, 1, 1, n, nrhs, 1.0, a, lda, b, ldb);
 
@@ -897,22 +897,22 @@ function LinalgModule(stdlib, foreign, heap) {
     if (uplo) {
       // lower triangular matrix
       paii = a + ((imul(n, n) | 0) - 1 << 3) | 0;
-      darray[paii >> 3] = 1.0 / darray[paii >> 3];
+      darray[paii >> 3] = 1.0 / +darray[paii >> 3];
       for (i = n - 2 | 0; (i | 0) >= 0; i = i - 1 | 0) {
         paii = a + ((imul(i, n) | 0) + i << 3) | 0;
         paij = a + ((imul(i + 1 | 0, n) | 0) + i << 3) | 0;
         pajj = a + ((imul(i + 1 | 0, n) | 0) + i + 1 << 3) | 0;
-        aii = darray[paii >> 3] = 1.0 / darray[paii >> 3];
+        aii = darray[paii >> 3] = 1.0 / +darray[paii >> 3];
         dtrmv(1, 0, 0, n - i | 0, pajj, lda, paij, n);
         dscal(n - i | 0, -aii, paij, n);
       }
     } else {
       // upper triangular matrix
-      darray[a >> 3] = 1.0 / darray[a >> 3];
+      darray[a >> 3] = 1.0 / +darray[a >> 3];
       for (i = 1 | 0; (i | 0) < (n | 0); i = i + 1 | 0) {
         paii = a + ((imul(i, n) | 0) + i << 3) | 0;
         paij = a + (i << 3) | 0;
-        aii = darray[paii >> 3] = 1.0 / darray[paii >> 3];
+        aii = darray[paii >> 3] = 1.0 / +darray[paii >> 3];
         dtrmv(0, 0, 0, i, a, lda, paij, n);
         dscal(i, -aii, paij, n);
       }
