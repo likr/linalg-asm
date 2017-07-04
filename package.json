@@ -1,10 +1,11 @@
 {
   "name": "linalg-asm",
-  "version": "0.0.1",
-  "description": "Linear algebra using asm.js",
+  "version": "0.0.2",
+  "description": "BLAS like linear algebra library using asm.js / WebAssembly",
   "main": "index.js",
   "files": [
-    "index.js"
+    "index.js",
+    "linalg.wasm"
   ],
   "directories": {
     "test": "test"
