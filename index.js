@@ -523,7 +523,8 @@ function LinalgModule(stdlib, foreign, heap) {
       }
       dakk = 1.0 / +darray[pakk >> 3];
       for (j = k + 1 | 0, jn = imul(j, n) | 0, pajk = a + (jn + k << 3) | 0; (j | 0) < (n | 0); j = j + 1 | 0, jn = jn + n | 0, pajk = pajk + inca | 0) {
-        ajk = darray[pajk >> 3] = darray[pajk >> 3] * dakk;
+        ajk = darray[pajk >> 3] * dakk;
+        darray[pajk >> 3] = ajk;
         daxpy(n - k - 1 | 0, -ajk,
               a + (kn + k + 1 << 3) | 0, 1,
               a + (jn + k + 1 << 3) | 0, 1);
@@ -562,7 +563,8 @@ function LinalgModule(stdlib, foreign, heap) {
         paii = a + ((imul(i, lda) | 0) + i << 3) | 0;
         pai = a + ((imul(i, lda) | 0) << 3) | 0;
         aii = +darray[paii >> 3];
-        aii = darray[paii >> 3] = +sqrt(aii - +ddot(i | 0, pai, 1, pai, 1));
+        aii = +sqrt(aii - +ddot(i | 0, pai, 1, pai, 1));
+        darray[paii >> 3] = aii;
         if ((n - i - 1 | 0) > 0) {
           dgemv(0, n - i - 1 | 0, i, -1.0, pai + (lda << 3) | 0, 1, pai, 1, 1.0, paii + (lda << 3) | 0, lda);
           dscal(n - i - 1 | 0, 1.0 / aii, paii + (lda << 3) | 0, lda);
@@ -574,7 +576,8 @@ function LinalgModule(stdlib, foreign, heap) {
         paii = a + ((imul(i, lda) | 0) + i << 3) | 0;
         pai = a + (i << 3) | 0;
         aii = +darray[paii >> 3];
-        aii = darray[paii >> 3] = +sqrt(aii - +ddot(i | 0, pai, lda, pai, lda));
+        aii = +sqrt(aii - +ddot(i | 0, pai, lda, pai, lda));
+        darray[paii >> 3] = aii;
         if ((n - i - 1 | 0) > 0) {
           dgemv(1, i, n - i - 1 | 0, -1.0, pai + 8 | 0, lda, pai, lda, 1.0, paii + 8 | 0, 1);
           dscal(n - i - 1 | 0, 1.0 / aii, paii + 8 | 0, lda);
@@ -902,7 +905,8 @@ function LinalgModule(stdlib, foreign, heap) {
         paii = a + ((imul(i, n) | 0) + i << 3) | 0;
         paij = a + ((imul(i + 1 | 0, n) | 0) + i << 3) | 0;
         pajj = a + ((imul(i + 1 | 0, n) | 0) + i + 1 << 3) | 0;
-        aii = darray[paii >> 3] = 1.0 / +darray[paii >> 3];
+        aii = 1.0 / +darray[paii >> 3];
+        darray[paii >> 3] = aii;
         dtrmv(1, 0, 0, n - i | 0, pajj, lda, paij, n);
         dscal(n - i | 0, -aii, paij, n);
       }
@@ -912,7 +916,8 @@ function LinalgModule(stdlib, foreign, heap) {
       for (i = 1 | 0; (i | 0) < (n | 0); i = i + 1 | 0) {
         paii = a + ((imul(i, n) | 0) + i << 3) | 0;
         paij = a + (i << 3) | 0;
-        aii = darray[paii >> 3] = 1.0 / +darray[paii >> 3];
+        aii = 1.0 / +darray[paii >> 3];
+        darray[paii >> 3] = aii;
         dtrmv(0, 0, 0, i, a, lda, paij, n);
         dscal(i, -aii, paij, n);
       }
