@@ -3,11 +3,14 @@
   "version": "0.0.1",
   "description": "Linear algebra using asm.js",
   "main": "index.js",
+  "files": [
+    "index.js"
+  ],
   "directories": {
     "test": "test"
   },
   "scripts": {
-    "test": "grunt test"
+    "test": "gulp test"
   },
   "repository": {
     "type": "git",
